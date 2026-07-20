@@ -31,8 +31,8 @@ def ask_gemini(question: str) -> str:
         return "Error: GEMINI_API_KEY not configured"
     try:
         url = (
-            "https://generativelanguage.googleapis.com/v1beta/models/"
-            "gemini-1.5-flash:generateContent?key=" + GEMINI_API_KEY
+            "https://generativelanguage.googleapis.com/v1/models/"
+            "gemini-2.5-flash:generateContent?key="+GEMINI_API_KEY
         )
         payload = {"contents": [{"parts": [{"text": question}]}]}
         r = requests.post(url, json=payload, timeout=REQUEST_TIMEOUT)
