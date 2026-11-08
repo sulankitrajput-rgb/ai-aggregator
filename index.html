@@ -1,899 +1,133 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Sky India Flight Simulator</title>
-
-<style>
-* { box-sizing: border-box; }
-
-body {
-    margin: 0;
-    overflow: hidden;
-    background: #87a9c7;
-    font-family: Arial, sans-serif;
-    color: white;
-}
-
-canvas { display: block; }
-
-#hud {
-    position: absolute;
-    top: 15px;
-    left: 15px;
-    padding: 15px;
-    width: 245px;
-    background: rgba(5, 15, 30, .78);
-    border: 1px solid rgba(255,255,255,.25);
-    border-radius: 12px;
-    line-height: 1.7;
-    font-size: 14px;
-}
-
-#hud strong { color: #69d9ff; }
-
-#controls {
-    position: absolute;
-    bottom: 15px;
-    left: 50%;
-    transform: translateX(-50%);
-    background: rgba(5, 15, 30, .85);
-    border: 1px solid rgba(255,255,255,.2);
-    border-radius: 12px;
-    padding: 12px 18px;
-    text-align: center;
-    width: min(95%, 650px);
-    font-size: 13px;
-}
-
-#controls button, #controls select {
-    padding: 9px 13px;
-    margin: 4px;
-    border: none;
-    border-radius: 6px;
-    background: #1686bd;
-    color: white;
-    cursor: pointer;
-}
-
-#controls button:hover { background: #26a9e9; }
-
-#throttle {
-    width: 150px;
-    vertical-align: middle;
-}
-
-#message {
-    position: absolute;
-    top: 18px;
-    left: 50%;
-    transform: translateX(-50%);
-    background: rgba(0,0,0,.65);
-    padding: 10px 18px;
-    border-radius: 8px;
-    font-weight: bold;
-    color: #fff;
-    text-align: center;
-}
-
-#help {
-    position: absolute;
-    right: 15px;
-    top: 15px;
-    background: rgba(5,15,30,.78);
-    padding: 12px;
-    border-radius: 10px;
-    font-size: 12px;
-    line-height: 1.8;
-}
-</style>
-
-<script type="importmap">
-{
-  "imports": {
-    "three": "https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js"
-  }
-}
-</script>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="theme-color" content="#071525" />
+  <title>SkyIndia — 3D Flight Simulator</title>
 </head>
-
 <body>
-
-<div id="hud">
-    <strong>SKY INDIA FLIGHT SIMULATOR</strong><br>
-    Aircraft: Twin-engine widebody<br>
-    Airport: VNS - Varanasi<br>
-    <hr>
-    Speed: <span id="speed">0</span> knots<br>
-    Altitude: <span id="altitude">0</span> ft<br>
-    Vertical speed: <span id="vspeed">0</span> ft/min<br>
-    Throttle: <span id="throttleValue">0</span>%<br>
-    Pitch: <span id="pitchValue">0</span>°<br>
-    Bank: <span id="bankValue">0</span>°<br>
-    Landing gear: <span id="gearStatus">DOWN</span><br>
-    Flaps: <span id="flapStatus">0</span>°
-</div>
-
-<div id="message">READY FOR TAKEOFF — RELEASE BRAKES AND APPLY THROTTLE</div>
-
-<div id="help">
-    <b>FLIGHT CONTROLS</b><br>
-    W / S — Throttle<br>
-    ↑ / ↓ — Pitch<br>
-    ← / → — Bank<br>
-    A / D — Rudder<br>
-    G — Landing gear<br>
-    F — Flaps<br>
-    C — Camera view<br>
-    SPACE — Brakes
-</div>
-
-<div id="controls">
-    Throttle:
-    <input id="throttle" type="range" min="0" max="100" value="0">
-    <span id="throttleNumber">0%</span>
-    <br>
-    <button id="gearButton">Retract / Extend Gear (G)</button>
-    <button id="flapButton">Flaps (F)</button>
-    <button id="cameraButton">Change Camera (C)</button>
-    <button id="resetButton">Reset Flight</button>
-    <br>
-    <select id="airport">
-        <option value="VNS">Varanasi (VNS)</option>
-        <option value="DEL">Delhi (DEL)</option>
-        <option value="BOM">Mumbai (BOM)</option>
-        <option value="BLR">Bengaluru (BLR)</option>
-        <option value="MAA">Chennai (MAA)</option>
-        <option value="CCU">Kolkata (CCU)</option>
-        <option value="HYD">Hyderabad (HYD)</option>
-        <option value="COK">Kochi (COK)</option>
-        <option value="GOI">Goa (GOI)</option>
-        <option value="AMD">Ahmedabad (AMD)</option>
-    </select>
-</div>
-
-<script type="module">
-import * as THREE from 'three';
-
-/* ---------------- SCENE ---------------- */
-
-const scene = new THREE.Scene();
-scene.background = new THREE.Color(0x91b5d5);
-scene.fog = new THREE.Fog(0x91b5d5, 4000, 15000);
-
-const camera = new THREE.PerspectiveCamera(
-    65, window.innerWidth / window.innerHeight, 0.1, 30000
-);
-
-const renderer = new THREE.WebGLRenderer({ antialias: true });
-renderer.setSize(window.innerWidth, window.innerHeight);
-renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
-renderer.shadowMap.enabled = true;
-renderer.shadowMap.type = THREE.PCFSoftShadowMap;
-renderer.toneMapping = THREE.ACESFilmicToneMapping;
-renderer.toneMappingExposure = 1.1;
-document.body.appendChild(renderer.domElement);
-
-scene.add(new THREE.HemisphereLight(0xdceeff, 0x536044, 2));
-
-const sun = new THREE.DirectionalLight(0xffffff, 3);
-sun.position.set(-1000, 2000, 1000);
-sun.castShadow = true;
-scene.add(sun);
-
-/* ---------------- MATERIALS ---------------- */
-
-const white = new THREE.MeshStandardMaterial({
-    color: 0xe5e8ec, roughness: .48, metalness: .18
-});
-
-const dark = new THREE.MeshStandardMaterial({
-    color: 0x202832, roughness: .55, metalness: .25
-});
-
-const metal = new THREE.MeshStandardMaterial({
-    color: 0x89939c, metalness: .8, roughness: .3
-});
-
-const glass = new THREE.MeshStandardMaterial({
-    color: 0x142d43, metalness: .5, roughness: .15
-});
-
-const rubber = new THREE.MeshStandardMaterial({
-    color: 0x111111, roughness: .95
-});
-
-const blue = new THREE.MeshStandardMaterial({
-    color: 0x173c65, roughness: .5
-});
-
-/* ---------------- AIRCRAFT ---------------- */
-
-const plane = new THREE.Group();
-scene.add(plane);
-
-const aircraft = new THREE.Group();
-plane.add(aircraft);
-
-function addMesh(parent, geometry, material, position, rotation) {
-    const mesh = new THREE.Mesh(geometry, material);
-    mesh.position.set(...position);
-    if (rotation) mesh.rotation.set(...rotation);
-    mesh.castShadow = true;
-    mesh.receiveShadow = true;
-    parent.add(mesh);
-    return mesh;
-}
-
-/* Fuselage: tapered wide-body body */
-
-const fuselagePoints = [
-    new THREE.Vector2(0, -19),
-    new THREE.Vector2(.35, -18),
-    new THREE.Vector2(.85, -15),
-    new THREE.Vector2(1.35, -10),
-    new THREE.Vector2(1.55, -3),
-    new THREE.Vector2(1.55, 5),
-    new THREE.Vector2(1.4, 11),
-    new THREE.Vector2(1.0, 15),
-    new THREE.Vector2(.5, 18),
-    new THREE.Vector2(0, 19)
-];
-
-const fuselageGeometry = new THREE.LatheGeometry(fuselagePoints, 40);
-fuselageGeometry.rotateX(-Math.PI / 2);
-
-addMesh(aircraft, fuselageGeometry, white, [0, 0, 0]);
-
-/* Nose cone detail */
-
-addMesh(
-    aircraft,
-    new THREE.SphereGeometry(.75, 24, 16),
-    white,
-    [0, .12, -17.2]
-);
-
-/* Cockpit windows */
-
-const cockpit = addMesh(
-    aircraft,
-    new THREE.BoxGeometry(1.65, .35, .8),
-    glass,
-    [0, 1.0, -15.9]
-);
-cockpit.rotation.x = -.15;
-
-/* Cabin windows */
-
-for (let side of [-1, 1]) {
-    for (let i = 0; i < 28; i++) {
-        const z = -12 + i * .85;
-
-        addMesh(
-            aircraft,
-            new THREE.SphereGeometry(.105, 8, 8),
-            glass,
-            [side * 1.48, .48, z]
-        );
-    }
-}
-
-/* ---------------- SWEPT WINGS ---------------- */
-
-function makeWing() {
-    const shape = new THREE.Shape();
-
-    shape.moveTo(1.1, -1.5);
-    shape.lineTo(1.1, 2.5);
-    shape.lineTo(18, 14);
-    shape.lineTo(16.8, 15);
-    shape.lineTo(2.2, 4.5);
-    shape.lineTo(1.1, 1.5);
-    shape.closePath();
-
-    const geometry = new THREE.ExtrudeGeometry(shape, {
-        depth: .22,
-        bevelEnabled: true,
-        bevelSegments: 2,
-        steps: 1,
-        bevelSize: .08,
-        bevelThickness: .08
-    });
-
-    geometry.rotateX(Math.PI / 2);
-
-    return geometry;
-}
-
-const wingGeometry = makeWing();
-
-const leftWing = addMesh(
-    aircraft, wingGeometry, white, [0, -.15, 0]
-);
-
-// Mirror the other wing
-const rightWing = addMesh(
-    aircraft, wingGeometry, white, [0, -.15, 0]
-);
-rightWing.scale.x = -1;
-
-/* Winglets */
-
-for (const side of [-1, 1]) {
-    const winglet = addMesh(
-        aircraft,
-        new THREE.BoxGeometry(.18, 1.5, 2.2),
-        blue,
-        [side * 17.1, .6, -12]
-    );
-    winglet.rotation.z = side * -.12;
-}
-
-/* Engine nacelles */
-
-function makeEngine(x) {
-    const engine = new THREE.Group();
-    aircraft.add(engine);
-    engine.position.set(x, -.65, 0);
-
-    const body = new THREE.Mesh(
-        new THREE.CylinderGeometry(.9, 1.05, 4.2, 32),
-        dark
-    );
-    body.rotation.x = Math.PI / 2;
-    body.castShadow = true;
-    engine.add(body);
-
-    const intake = new THREE.Mesh(
-        new THREE.TorusGeometry(.87, .13, 12, 32),
-        metal
-    );
-    intake.position.z = -2.05;
-    engine.add(intake);
-
-    const inside = new THREE.Mesh(
-        new THREE.CircleGeometry(.73, 32),
-        dark
-    );
-    inside.position.z = -2.08;
-    engine.add(inside);
-
-    const spinner = new THREE.Mesh(
-        new THREE.ConeGeometry(.22, .6, 16),
-        metal
-    );
-    spinner.rotation.x = -Math.PI / 2;
-    spinner.position.z = -1.7;
-    engine.add(spinner);
-
-    return engine;
-}
-
-const engines = [
-    makeEngine(-5.4),
-    makeEngine(5.4)
-];
-
-/* Engine pylons */
-
-for (const side of [-1, 1]) {
-    const pylon = addMesh(
-        aircraft,
-        new THREE.BoxGeometry(.55, 1.2, 3.5),
-        metal,
-        [side * 5.4, -.1, 0]
-    );
-    pylon.rotation.x = -.12;
-}
-
-/* ---------------- TAIL ---------------- */
-
-/* Horizontal stabilizers */
-
-const tailShape = new THREE.Shape();
-tailShape.moveTo(.6, -1);
-tailShape.lineTo(.6, 1);
-tailShape.lineTo(7, 5);
-tailShape.lineTo(6.5, 5.5);
-tailShape.lineTo(1, 2);
-tailShape.closePath();
-
-const tailGeometry = new THREE.ExtrudeGeometry(tailShape, {
-    depth: .16, bevelEnabled: false
-});
-tailGeometry.rotateX(Math.PI / 2);
-
-const tailLeft = addMesh(
-    aircraft, tailGeometry, white, [0, 0, 14]
-);
-const tailRight = addMesh(
-    aircraft, tailGeometry, white, [0, 0, 14]
-);
-tailRight.scale.x = -1;
-
-/* Vertical tail fin */
-
-const finShape = new THREE.Shape();
-finShape.moveTo(0, 0);
-finShape.lineTo(0, 5.8);
-finShape.lineTo(3.3, 9.5);
-finShape.lineTo(4.2, 9.4);
-finShape.lineTo(2.5, 0);
-finShape.closePath();
-
-const finGeometry = new THREE.ExtrudeGeometry(finShape, {
-    depth: .22, bevelEnabled: false
-});
-
-addMesh(
-    aircraft,
-    finGeometry,
-    blue,
-    [0, .5, 14]
-);
-
-/* ---------------- LANDING GEAR ---------------- */
-
-const landingGear = [];
-
-function makeWheel(parent, x, y, z, size) {
-    const wheel = new THREE.Mesh(
-        new THREE.CylinderGeometry(size, size, .28, 20),
-        rubber
-    );
-
-    wheel.rotation.z = Math.PI / 2;
-    wheel.position.set(x, y, z);
-    wheel.castShadow = true;
-    parent.add(wheel);
-
-    const hub = new THREE.Mesh(
-        new THREE.CylinderGeometry(size * .4, size * .4, .3, 16),
-        metal
-    );
-
-    hub.rotation.z = Math.PI / 2;
-    hub.position.set(x, y, z);
-    parent.add(hub);
-}
-
-function makeGear(x, z, wheelCount) {
-    const gear = new THREE.Group();
-    aircraft.add(gear);
-
-    gear.position.set(x, -.6, z);
-
-    const strut = addMesh(
-        gear,
-        new THREE.CylinderGeometry(.09, .12, 1.5, 12),
-        metal,
-        [0, -.8, 0]
-    );
-
-    const wheelPositions = wheelCount === 2
-        ? [-.45, .45]
-        : [-.7, 0, .7];
-
-    for (const offset of wheelPositions) {
-        makeWheel(gear, offset, -1.55, 0, .42);
-    }
-
-    landingGear.push({
-        group: gear,
-        downY: -.6,
-        upY: .15
-    });
-}
-
-makeGear(-.85, -12.5, 2);
-makeGear(.85, -12.5, 2);
-makeGear(0, 10.5, 4);
-
-/* ---------------- AIRPORT / RUNWAY ---------------- */
-
-const ground = new THREE.Mesh(
-    new THREE.PlaneGeometry(20000, 20000),
-    new THREE.MeshStandardMaterial({ color: 0x597c48 })
-);
-ground.rotation.x = -Math.PI / 2;
-ground.position.y = -1;
-ground.receiveShadow = true;
-scene.add(ground);
-
-const runway = new THREE.Mesh(
-    new THREE.PlaneGeometry(65, 4500),
-    new THREE.MeshStandardMaterial({
-        color: 0x34383d,
-        roughness: .9
-    })
-);
-
-runway.rotation.x = -Math.PI / 2;
-runway.position.set(0, .02, -1800);
-runway.receiveShadow = true;
-scene.add(runway);
-
-/* Runway markings */
-
-function runwayMark(x, z, width, length, color = 0xffffff) {
-    const mark = new THREE.Mesh(
-        new THREE.PlaneGeometry(width, length),
-        new THREE.MeshBasicMaterial({ color })
-    );
-    mark.rotation.x = -Math.PI / 2;
-    mark.position.set(x, .05, z);
-    scene.add(mark);
-}
-
-for (let z = 350; z > -4000; z -= 100) {
-    runwayMark(0, z, .7, 35);
-}
-
-for (let side of [-1, 1]) {
-    runwayMark(side * 28, -1800, .8, 4500);
-
-    for (let i = 0; i < 8; i++) {
-        runwayMark(side * 20, 300 - i * 4, 2, 2);
-    }
-}
-
-/* Airport terminal */
-
-const terminal = new THREE.Mesh(
-    new THREE.BoxGeometry(150, 18, 45),
-    new THREE.MeshStandardMaterial({ color: 0xb9c4ce })
-);
-terminal.position.set(140, 9, 100);
-scene.add(terminal);
-
-const terminalGlass = new THREE.Mesh(
-    new THREE.BoxGeometry(151, 8, 2),
-    new THREE.MeshStandardMaterial({
-        color: 0x548ba5,
-        metalness: .5,
-        roughness: .2
-    })
-);
-terminalGlass.position.set(140, 9, 77);
-scene.add(terminalGlass);
-
-/* Distant scenery */
-
-for (let i = 0; i < 100; i++) {
-    const tree = new THREE.Mesh(
-        new THREE.ConeGeometry(8, 30, 8),
-        new THREE.MeshStandardMaterial({ color: 0x315c37 })
-    );
-
-    const x = (Math.random() - .5) * 4000;
-    const z = -Math.random() * 6000 - 500;
-
-    tree.position.set(x, 14, z);
-    scene.add(tree);
-}
-
-/* ---------------- FLIGHT PHYSICS ---------------- */
-
-let speed = 0;
-let altitude = 0;
-let verticalSpeed = 0;
-
-let throttle = 0;
-let pitch = 0;
-let bank = 0;
-let yaw = 0;
-
-let gearDown = true;
-let gearAnimation = 1;
-
-let flaps = 0;
-let cameraMode = 0;
-let brakes = false;
-
-let airborne = false;
-
-const keys = {};
-
-const throttleSlider = document.getElementById('throttle');
-
-function updateThrottle(value) {
-    throttle = THREE.MathUtils.clamp(value, 0, 100);
-    throttleSlider.value = throttle;
-    document.getElementById('throttleNumber').textContent =
-        Math.round(throttle) + '%';
-    document.getElementById('throttleValue').textContent =
-        Math.round(throttle);
-}
-
-throttleSlider.addEventListener('input', () => {
-    updateThrottle(Number(throttleSlider.value));
-});
-
-function toggleGear() {
-    if (!airborne && !gearDown) {
-        document.getElementById('message').textContent =
-            'LANDING GEAR MUST BE DOWN FOR TAKEOFF';
-        return;
-    }
-
-    gearDown = !gearDown;
-
-    document.getElementById('gearStatus').textContent =
-        gearDown ? 'DOWN' : 'RETRACTING';
-}
-
-function toggleFlaps() {
-    flaps = flaps === 0 ? 15 : flaps === 15 ? 30 : 0;
-    document.getElementById('flapStatus').textContent = flaps;
-}
-
-function changeCamera() {
-    cameraMode = (cameraMode + 1) % 3;
-}
-
-document.getElementById('gearButton').onclick = toggleGear;
-document.getElementById('flapButton').onclick = toggleFlaps;
-document.getElementById('cameraButton').onclick = changeCamera;
-document.getElementById('resetButton').onclick = resetFlight;
-
-window.addEventListener('keydown', event => {
-    keys[event.code] = true;
-
-    if (event.code === 'KeyG' && !event.repeat) toggleGear();
-    if (event.code === 'KeyF' && !event.repeat) toggleFlaps();
-    if (event.code === 'KeyC' && !event.repeat) changeCamera();
-    if (event.code === 'Space') brakes = true;
-});
-
-window.addEventListener('keyup', event => {
-    keys[event.code] = false;
-    if (event.code === 'Space') brakes = false;
-});
-
-function resetFlight() {
-    speed = 0;
-    altitude = 0;
-    verticalSpeed = 0;
-    pitch = 0;
-    bank = 0;
-    yaw = 0;
-    airborne = false;
-
-    plane.position.set(0, 2, 350);
-    plane.rotation.set(0, 0, 0);
-
-    gearDown = true;
-    gearAnimation = 1;
-
-    for (const g of landingGear) {
-        g.group.position.y = g.downY;
-    }
-
-    updateThrottle(0);
-
-    document.getElementById('gearStatus').textContent = 'DOWN';
-    document.getElementById('message').textContent =
-        'READY FOR TAKEOFF — APPLY THROTTLE';
-}
-
-resetFlight();
-
-/* ---------------- AIRCRAFT MOVEMENT ---------------- */
-
-const clock = new THREE.Clock();
-
-function updateFlight(dt) {
-    dt = Math.min(dt, .04);
-
-    if (keys.KeyW) updateThrottle(throttle + 35 * dt);
-    if (keys.KeyS) updateThrottle(throttle - 35 * dt);
-
-    if (keys.ArrowUp) pitch += .55 * dt;
-    if (keys.ArrowDown) pitch -= .55 * dt;
-
-    if (keys.ArrowLeft) bank += .75 * dt;
-    if (keys.ArrowRight) bank -= .75 * dt;
-
-    if (keys.KeyA) yaw += .4 * dt;
-    if (keys.KeyD) yaw -= .4 * dt;
-
-    pitch = THREE.MathUtils.clamp(pitch, -.35, .45);
-    bank = THREE.MathUtils.clamp(bank, -.75, .75);
-
-    const targetBank = keys.ArrowLeft || keys.ArrowRight
-        ? bank : bank * .98;
-
-    bank = THREE.MathUtils.damp(bank, targetBank, 2, dt);
-
-    /* Engine thrust and drag */
-
-    const thrust = throttle / 100 * 28;
-    const drag = .012 * speed + .00045 * speed * speed;
-
-    let acceleration = thrust - drag;
-
-    if (brakes && !airborne) {
-        acceleration -= 18;
-    }
-
-    speed += acceleration * dt;
-    speed = Math.max(0, Math.min(speed, 180));
-
-    /* Convert m/s to knots for display */
-
-    const knots = speed * 1.94384;
-
-    /* Ground roll and takeoff */
-
-    if (!airborne) {
-        altitude = 0;
-        verticalSpeed = 0;
-
-        plane.position.y = 2;
-
-        /*
-        Takeoff requires:
-        - Sufficient speed
-        - Nose raised by the pilot
-        - Landing gear down
-        */
-
-        if (knots > 125 && pitch > .07 && gearDown) {
-            airborne = true;
-            verticalSpeed = 2;
-
-            document.getElementById('message').textContent =
-                'AIRBORNE — CLIMBING! RETRACT GEAR WITH G';
-        } else if (knots > 100) {
-            document.getElementById('message').textContent =
-                'ROTATE — PULL UP WITH ARROW UP';
-        } else if (throttle > 80) {
-            document.getElementById('message').textContent =
-                'TAKEOFF ROLL — BUILDING SPEED';
-        }
-    } else {
-        /* Lift and gravity model */
-
-        const flapLift = flaps > 0 ? .15 : 0;
-        const angleLift = Math.max(0, pitch) * .9;
-
-        const lift = (speed * speed / 1000) *
-            (angleLift + flapLift + .08);
-
-        const gravity = 9.81;
-
-        verticalSpeed += (lift - gravity) * dt;
-
-        /* Simplified flight stability */
-
-        verticalSpeed *= .995;
-
-        altitude += verticalSpeed * dt;
-        altitude = Math.max(0, altitude);
-
-        plane.position.y = altitude + 2;
-
-        if (altitude <= 0 && verticalSpeed < 0) {
-            airborne = false;
-            altitude = 0;
-            verticalSpeed = 0;
-            pitch = 0;
-            gearDown = true;
-
-            document.getElementById('message').textContent =
-                'LANDED — LANDING GEAR DOWN';
-        }
-
-        document.getElementById('message').textContent =
-            altitude > 0
-                ? 'IN FLIGHT — ENJOY YOUR JOURNEY'
-                : 'LANDING';
-    }
-
-    /* Move forward along runway / flight path */
-
-    const forward = new THREE.Vector3(0, 0, -1);
-    forward.applyEuler(plane.rotation);
-
-    plane.position.x += forward.x * speed * dt;
-    plane.position.z += forward.z * speed * dt;
-
-    /* Apply aircraft attitude */
-
-    plane.rotation.x = pitch;
-    plane.rotation.y += yaw * dt;
-    plane.rotation.z = -bank;
-
-    /* Landing gear animation */
-
-    const targetGear = gearDown ? 1 : 0;
-
-    gearAnimation = THREE.MathUtils.damp(
-        gearAnimation, targetGear, 2.5, dt
-    );
-
-    for (const g of landingGear) {
-        g.group.position.y = THREE.MathUtils.lerp(
-            g.upY, g.downY, gearAnimation
-        );
-    }
-
-    document.getElementById('gearStatus').textContent =
-        gearAnimation > .95 ? 'DOWN' :
-        gearAnimation < .05 ? 'UP' : 'MOVING';
-
-    /* Flight instruments */
-
-    document.getElementById('speed').textContent =
-        Math.round(knots);
-
-    document.getElementById('altitude').textContent =
-        Math.round(altitude * 3.28084);
-
-    document.getElementById('vspeed').textContent =
-        Math.round(verticalSpeed * 196.85);
-
-    document.getElementById('pitchValue').textContent =
-        Math.round(pitch * 57.3);
-
-    document.getElementById('bankValue').textContent =
-        Math.round(bank * 57.3);
-}
-
-/* ---------------- CAMERA ---------------- */
-
-function updateCamera(dt) {
-    const offset = new THREE.Vector3();
-
-    if (cameraMode === 0) {
-        offset.set(0, 7, 25);
-    } else if (cameraMode === 1) {
-        offset.set(0, 3, -24);
-    } else {
-        offset.set(0, 35, 5);
-    }
-
-    offset.applyQuaternion(plane.quaternion);
-
-    const desiredPosition = plane.position.clone().add(offset);
-
-    camera.position.lerp(
-        desiredPosition,
-        1 - Math.exp(-3 * dt)
-    );
-
-    const target = plane.position.clone();
-    target.y += 1;
-
-    camera.lookAt(target);
-}
-
-/* ---------------- ANIMATION LOOP ---------------- */
-
-function animate() {
-    requestAnimationFrame(animate);
-
-    const dt = clock.getDelta();
-
-    updateFlight(dt);
-    updateCamera(dt);
-
-    renderer.render(scene, camera);
-}
-
-animate();
-
-/* ---------------- RESIZE ---------------- */
-
-window.addEventListener('resize', () => {
-    camera.aspect = window.innerWidth / window.innerHeight;
-    camera.updateProjectionMatrix();
-
-    renderer.setSize(window.innerWidth, window.innerHeight);
-});
-</script>
-
+  <div id="app">
+    <header class="topbar">
+      <div class="brand">
+        <span class="brand-mark">✈</span>
+        <div>
+          <strong>SKYINDIA</strong>
+          <small>FLIGHT SIMULATOR</small>
+        </div>
+      </div>
+      <div class="top-status">
+        <span class="live-dot"></span>
+        SIMULATION MODE
+        <span class="top-divider"></span>
+        <span id="simClock">LOCAL 12:00</span>
+      </div>
+    </header>
+
+    <main class="layout">
+      <aside class="sidebar">
+        <div class="section-kicker">FLIGHT SETUP</div>
+        <h1>Prepare your flight</h1>
+        <p class="muted">Choose an aircraft, airline and Indian airport.</p>
+
+        <label for="aircraftSelect">AIRCRAFT</label>
+        <select id="aircraftSelect"></select>
+        <div class="aircraft-tag" id="aircraftDescription"></div>
+
+        <label for="airlineSelect">AIRLINE LIVERY</label>
+        <select id="airlineSelect"></select>
+
+        <label for="airportSelect">DEPARTURE AIRPORT</label>
+        <select id="airportSelect"></select>
+
+        <div class="airport-card">
+          <div class="airport-code" id="airportCode">VNS</div>
+          <div>
+            <strong id="airportName">Lal Bahadur Shastri International</strong>
+            <small id="airportCity">Varanasi, Uttar Pradesh</small>
+          </div>
+          <span class="featured">FEATURED</span>
+        </div>
+
+        <div class="button-row">
+          <button class="primary" id="startBtn">▶ START FLIGHT</button>
+          <button class="secondary" id="resetBtn">↺</button>
+        </div>
+
+        <div class="setup-note">
+          Press START, hold SHIFT to increase thrust, and press W to rotate
+          after reaching takeoff speed. Press G after liftoff to retract gear.
+        </div>
+
+        <div class="section-kicker controls-title">KEYBOARD CONTROLS</div>
+
+        <div class="key-grid">
+          <span><kbd>W</kbd><small>Pitch up</small></span>
+          <span><kbd>S</kbd><small>Pitch down</small></span>
+          <span><kbd>A</kbd><small>Bank left</small></span>
+          <span><kbd>D</kbd><small>Bank right</small></span>
+          <span><kbd>Q</kbd><small>Yaw left</small></span>
+          <span><kbd>E</kbd><small>Yaw right</small></span>
+          <span><kbd>SHIFT</kbd><small>Increase throttle</small></span>
+          <span><kbd>CTRL</kbd><small>Decrease throttle</small></span>
+          <span><kbd>G</kbd><small>Gear toggle</small></span>
+          <span><kbd>F</kbd><small>Flaps cycle</small></span>
+          <span><kbd>B</kbd><small>Brakes</small></span>
+          <span><kbd>R</kbd><small>Reset</small></span>
+        </div>
+      </aside>
+
+      <section class="sim-area">
+        <div id="scene"></div>
+
+        <div class="scene-top">
+          <div class="scene-chip">
+            <span class="live-dot"></span> EXTERNAL CAMERA
+          </div>
+          <div class="scene-chip" id="flightState">READY ON STAND</div>
+        </div>
+
+        <div class="hud">
+          <div class="hud-item">
+            <small>INDICATED SPEED</small>
+            <strong><span id="speed">0</span><em> KT</em></strong>
+          </div>
+          <div class="hud-item">
+            <small>ALTITUDE</small>
+            <strong><span id="altitude">0</span><em> FT</em></strong>
+          </div>
+          <div class="hud-item">
+            <small>THROTTLE</small>
+            <strong><span id="throttle">0</span><em> %</em></strong>
+            <div class="meter"><i id="throttleBar"></i></div>
+          </div>
+          <div class="hud-item">
+            <small>VERTICAL SPEED</small>
+            <strong><span id="vspeed">0</span><em> FPM</em></strong>
+          </div>
+          <div class="hud-item">
+            <small>CONFIGURATION</small>
+            <strong class="small-value">
+              <span id="gear">GEAR DOWN</span><br>
+              <span id="flaps">FLAPS 0</span>
+            </strong>
+          </div>
+        </div>
+
+        <div class="view-help">
+          SHIFT throttle · W rotate/lift · G retract gear · A/D bank
+        </div>
+
+        <div class="loading" id="loading">INITIALIZING 3D SCENE…</div>
+      </section>
+    </main>
+
+    <footer>
+      <span>SKYINDIA SIM · COMMUNITY PROJECT</span>
+      <span>NOT FOR REAL-WORLD FLIGHT OPERATIONS</span>
+    </footer>
+  </div>
+
+  <script type="module" src="/src/main.js"></script>
 </body>
 </html>
