@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>SkyIndia - 3D Flight Simulator</title>
+
+<link rel="stylesheet" href="/src/style.css">
+</head>
+
+<body>
+
+<header class="topbar">
+
+<div class="brand">
+<span class="brand-mark">✈</span>
+
+<div>
+<strong>SKYINDIA</strong>
+<small>FLIGHT SIMULATOR</small>
+</div>
+</div>
+
+<div class="top-status">
+<span class="live-dot"></span>
+SIMULATION MODE
+</div>
+
+</header>
+
+<main class="layout">
+
+<aside class="sidebar">
+
+<div class="section-kicker">FLIGHT SETUP</div>
+
+<h1>Prepare your flight</h1>
+
+<p class="muted">
+Choose your aircraft, airline and airport.
+</p>
+
+<label>AIRCRAFT</label>
+
+<select id="aircraftSelect"></select>
+
+<div id="aircraftDescription"></div>
+
+<label>AIRLINE</label>
+
+<select id="airlineSelect"></select>
+
+<label>DEPARTURE AIRPORT</label>
+
+<select id="airportSelect"></select>
+
+<div class="airport-card">
+
+<div class="airport-code" id="airportCode">
+VNS
+</div>
+
+<div>
+<strong id="airportName">
+Lal Bahadur Shastri International
+</strong>
+
+<small id="airportCity">
+Varanasi, Uttar Pradesh
+</small>
+</div>
+
+</div>
+
+<div class="button-row">
+
+<button class="primary" id="startBtn">
+▶ START FLIGHT
+</button>
+
+<button class="secondary" id="resetBtn">
+↺
+</button>
+
+</div>
+
+<div class="setup-note">
+Educational 3D flight simulator prototype.
+Not suitable for real-world pilot training.
+</div>
+
+<h3>KEYBOARD CONTROLS</h3>
+
+<div class="key-grid">
+
+<span><kbd>W</kbd> Pitch up</span>
+<span><kbd>S</kbd> Pitch down</span>
+
+<span><kbd>A</kbd> Bank left</span>
+<span><kbd>D</kbd> Bank right</span>
+
+<span><kbd>Q</kbd> Yaw left</span>
+<span><kbd>E</kbd> Yaw right</span>
+
+<span><kbd>SHIFT</kbd> Throttle up</span>
+<span><kbd>CTRL</kbd> Throttle down</span>
+
+<span><kbd>G</kbd> Landing gear</span>
+<span><kbd>F</kbd> Flaps</span>
+
+<span><kbd>B</kbd> Brakes</span>
+<span><kbd>R</kbd> Reset</span>
+
+</div>
+
+</aside>
+
+<section class="sim-area">
+
+<div id="scene"></div>
+
+<div class="scene-top">
+
+<div class="scene-chip">
+<span class="live-dot"></span>
+EXTERNAL CAMERA
+</div>
+
+<div class="scene-chip" id="flightState">
+READY ON STAND
+</div>
+
+</div>
+
+<div class="hud">
+
+<div class="hud-item">
+<small>INDICATED SPEED</small>
+<strong><span id="speed">0</span> KT</strong>
+</div>
+
+<div class="hud-item">
+<small>ALTITUDE</small>
+<strong><span id="altitude">0</span> FT</strong>
+</div>
+
+<div class="hud-item">
+<small>THROTTLE</small>
+<strong><span id="throttle">0</span>%</strong>
+<div class="meter">
+<i id="throttleBar"></i>
+</div>
+</div>
+
+<div class="hud-item">
+<small>VERTICAL SPEED</small>
+<strong><span id="vspeed">0</span> FPM</strong>
+</div>
+
+<div class="hud-item">
+<small>CONFIGURATION</small>
+<strong class="small-value">
+<span id="gear">GEAR DOWN</span>
+<br>
+<span id="flaps">FLAPS 0</span>
+</strong>
+</div>
+
+</div>
+
+<div class="view-help">
+Drag to orbit · Scroll to zoom
+</div>
+
+<div class="loading" id="loading">
+INITIALIZING 3D SCENE...
+</div>
+
+</section>
+
+</main>
+
+<footer>
+SKYINDIA SIM · COMMUNITY PROJECT
+</footer>
+
+<script type="module" src="/src/main.js"></script>
+
+</body>
+</html>
