@@ -1,340 +1,397 @@
 @import url('https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Manrope:wght@400;500;600;700;800&display=swap');
 
+:root {
+  font-family: Manrope, system-ui, sans-serif;
+  color: #eef5ff;
+  background: #071525;
+}
+
 * {
-    box-sizing: border-box;
+  box-sizing: border-box;
 }
 
 body {
-    margin: 0;
-    font-family: Manrope, Arial, sans-serif;
-    background: #071525;
-    color: white;
+  margin: 0;
+  min-width: 320px;
+  background: radial-gradient(ellipse at 70% 20%, #12304a 0, #071525 55%);
+  min-height: 100vh;
 }
 
 .topbar {
-    height: 68px;
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    padding: 0 28px;
-    border-bottom: 1px solid #294056;
-    background: #071321;
+  height: 68px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 28px;
+  border-bottom: 1px solid #294056;
+  background: #071321e8;
+  position: relative;
+  z-index: 2;
 }
 
 .brand {
-    display: flex;
-    align-items: center;
-    gap: 12px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
 }
 
 .brand-mark {
-    background: #ffb84d;
-    color: #142235;
-    padding: 9px;
-    border-radius: 9px;
-    font-size: 22px;
+  width: 36px;
+  height: 36px;
+  border-radius: 10px;
+  background: #ffb84d;
+  color: #142235;
+  display: grid;
+  place-items: center;
+  font-size: 21px;
 }
 
 .brand strong {
-    display: block;
-    letter-spacing: 2px;
+  display: block;
+  letter-spacing: 2px;
+  font-size: 14px;
 }
 
 .brand small {
-    display: block;
-    color: #8ea4ba;
-    font-size: 9px;
+  display: block;
+  color: #8ea4ba;
+  letter-spacing: 2px;
+  font: 9px 'DM Mono', monospace;
+  margin-top: 2px;
+}
+
+.top-status,
+.section-kicker,
+.scene-chip,
+.hud-item small,
+footer,
+.view-help {
+  font: 10px 'DM Mono', monospace;
+  letter-spacing: 1.1px;
+  color: #9bb0c5;
 }
 
 .top-status {
-    font-size: 10px;
-    color: #9bb0c5;
+  display: flex;
+  align-items: center;
+  gap: 10px;
 }
 
 .live-dot {
-    display: inline-block;
-    height: 7px;
-    width: 7px;
-    border-radius: 50%;
-    background: #53d6a2;
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: #53d6a2;
+  display: inline-block;
+  box-shadow: 0 0 12px #53d6a2;
+}
+
+.top-divider {
+  height: 15px;
+  border-left: 1px solid #40546a;
+  margin: 0 5px;
 }
 
 .layout {
-    display: grid;
-    grid-template-columns: 330px 1fr;
-    min-height: calc(100vh - 104px);
-    padding: 18px;
-    gap: 18px;
+  display: grid;
+  grid-template-columns: 330px minmax(0, 1fr);
+  min-height: calc(100vh - 104px);
+  padding: 18px;
+  gap: 18px;
 }
 
 .sidebar {
-    background: #0d2032;
-    border: 1px solid #294056;
-    border-radius: 15px;
-    padding: 23px 21px;
+  background: #0d2032;
+  border: 1px solid #294056;
+  border-radius: 15px;
+  padding: 23px 21px;
+  box-shadow: 0 15px 45px #0003;
 }
 
 .section-kicker {
-    color: #ffbd62;
-    font-size: 10px;
-    letter-spacing: 2px;
+  color: #ffbd62;
+  font-size: 9px;
 }
 
 .sidebar h1 {
-    font-size: 23px;
+  font-size: 23px;
+  margin: 10px 0 5px;
 }
 
 .muted {
-    color: #91a6bb;
-    font-size: 12px;
+  font-size: 12px;
+  color: #91a6bb;
+  margin: 0 0 23px;
 }
 
 label {
-    display: block;
-    margin: 17px 0 8px;
-    font-size: 10px;
-    color: #a9bed1;
-    letter-spacing: 1px;
+  display: block;
+  font: 10px 'DM Mono', monospace;
+  color: #a9bed1;
+  letter-spacing: 1px;
+  margin: 17px 0 8px;
 }
 
 select {
-    width: 100%;
-    padding: 12px;
-    background: #102a40;
-    border: 1px solid #36536c;
-    border-radius: 8px;
-    color: white;
+  width: 100%;
+  padding: 12px;
+  background: #102a40;
+  border: 1px solid #36536c;
+  border-radius: 8px;
+  color: #f2f7ff;
+  font: 12px Manrope;
 }
 
-#aircraftDescription {
-    color: #91a6bb;
-    font-size: 10px;
-    margin-top: 7px;
+.aircraft-tag {
+  font-size: 10px;
+  color: #839db4;
+  margin: 7px 1px 0;
 }
 
 .airport-card {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    margin-top: 15px;
-    padding: 12px;
-    background: #102a40;
-    border: 1px solid #36536c;
-    border-radius: 9px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-top: 11px;
+  padding: 12px;
+  background: #102a40;
+  border: 1px solid #36536c;
+  border-radius: 9px;
 }
 
 .airport-code {
-    color: #ffbd62;
-    font-size: 22px;
-    font-weight: bold;
+  font: 700 21px 'DM Mono', monospace;
+  color: #ffbd62;
 }
 
 .airport-card strong {
-    font-size: 10px;
+  font-size: 10px;
+  display: block;
 }
 
 .airport-card small {
-    display: block;
-    color: #93a9be;
-    font-size: 9px;
+  font-size: 9px;
+  color: #93a9be;
+  display: block;
+  margin-top: 3px;
+}
+
+.featured {
+  margin-left: auto;
+  font: 8px 'DM Mono', monospace;
+  color: #66d9ae;
+  border: 1px solid #28795f;
+  padding: 4px;
+  border-radius: 4px;
 }
 
 .button-row {
-    display: flex;
-    gap: 8px;
-    margin-top: 19px;
+  display: flex;
+  gap: 8px;
+  margin-top: 19px;
 }
 
-button {
-    border: 0;
-    border-radius: 8px;
-    cursor: pointer;
-    padding: 13px;
+.primary,
+.secondary {
+  border: 0;
+  border-radius: 8px;
+  cursor: pointer;
+  font: 700 11px Manrope;
 }
 
 .primary {
-    background: #ffb84d;
-    color: #172638;
-    flex: 1;
-    font-weight: bold;
+  background: #ffb84d;
+  color: #172638;
+  flex: 1;
+  padding: 13px;
 }
 
 .secondary {
-    background: #1c3b55;
-    color: white;
-    font-size: 20px;
+  width: 46px;
+  background: #1c3b55;
+  color: white;
+  font-size: 20px;
 }
 
 .setup-note {
-    color: #7891a8;
-    font-size: 9px;
-    line-height: 1.6;
-    margin-top: 12px;
+  font-size: 9px;
+  line-height: 1.55;
+  color: #7891a8;
+  margin-top: 12px;
 }
 
-.sidebar h3 {
-    margin-top: 25px;
-    font-size: 10px;
-    color: #ffbd62;
-    letter-spacing: 1px;
+.controls-title {
+  margin-top: 25px;
+  padding-top: 17px;
+  border-top: 1px solid #294056;
 }
 
 .key-grid {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 12px 8px;
-    font-size: 9px;
-    color: #92a8bc;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 11px 8px;
+  margin-top: 14px;
 }
 
-kbd {
-    background: #19334a;
-    border: 1px solid #38546d;
-    border-radius: 5px;
-    padding: 5px;
-    color: white;
+.key-grid span {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.key-grid kbd {
+  min-width: 28px;
+  text-align: center;
+  padding: 5px 4px;
+  background: #19334a;
+  border: 1px solid #38546d;
+  border-radius: 5px;
+  font: 10px 'DM Mono', monospace;
+}
+
+.key-grid small {
+  font-size: 9px;
+  color: #92a8bc;
 }
 
 .sim-area {
-    position: relative;
-    min-height: 670px;
-    border: 1px solid #294056;
-    border-radius: 15px;
-    overflow: hidden;
-    background: #8fc4df;
+  position: relative;
+  min-height: 670px;
+  border: 1px solid #294056;
+  border-radius: 15px;
+  overflow: hidden;
+  background: #8fc4df;
 }
 
 #scene {
-    position: absolute;
-    inset: 0;
+  position: absolute;
+  inset: 0;
 }
 
 .scene-top {
-    position: absolute;
-    top: 16px;
-    left: 16px;
-    right: 16px;
-    display: flex;
-    justify-content: space-between;
-    pointer-events: none;
+  position: absolute;
+  top: 16px;
+  left: 16px;
+  right: 16px;
+  display: flex;
+  justify-content: space-between;
+  pointer-events: none;
 }
 
 .scene-chip {
-    padding: 9px;
-    background: #071b2bdb;
-    border-radius: 6px;
-    font-size: 10px;
+  padding: 9px 11px;
+  background: #071b2bd9;
+  border: 1px solid #476178;
+  border-radius: 6px;
+  color: #e6f1fa;
 }
 
 .hud {
-    position: absolute;
-    bottom: 18px;
-    left: 18px;
-    right: 18px;
-    display: grid;
-    grid-template-columns: repeat(5, 1fr);
-    background: #081a2b;
-    border: 1px solid #345069;
-    border-radius: 9px;
-    overflow: hidden;
+  position: absolute;
+  bottom: 18px;
+  left: 18px;
+  right: 18px;
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 1px;
+  background: #345069;
+  border: 1px solid #345069;
+  border-radius: 9px;
+  overflow: hidden;
 }
 
 .hud-item {
-    padding: 12px;
-    border-right: 1px solid #345069;
+  padding: 12px;
+  background: #081a2bef;
 }
 
 .hud-item small {
-    display: block;
-    font-size: 8px;
-    color: #9bb0c5;
+  display: block;
+  font-size: 8px;
 }
 
 .hud-item strong {
-    display: block;
-    font-size: 20px;
-    margin-top: 7px;
+  display: block;
+  font: 500 23px 'DM Mono', monospace;
+  margin-top: 7px;
+}
+
+.hud-item em {
+  font: 9px 'DM Mono', monospace;
+  color: #9db1c4;
+  font-style: normal;
 }
 
 .hud-item .small-value {
-    font-size: 11px;
-    line-height: 1.8;
+  font-size: 11px;
+  line-height: 1.8;
 }
 
 .meter {
-    height: 3px;
-    background: #294258;
-    margin-top: 7px;
+  height: 3px;
+  background: #294258;
+  margin-top: 7px;
 }
 
 .meter i {
-    display: block;
-    height: 100%;
-    background: #ffbd62;
-    width: 0;
+  display: block;
+  height: 100%;
+  width: 0;
+  background: #ffbd62;
 }
 
 .view-help {
-    position: absolute;
-    bottom: 105px;
-    right: 20px;
-    color: #17364d;
-    font-size: 9px;
+  position: absolute;
+  bottom: 103px;
+  right: 20px;
+  color: #17364d;
+  background: #ffffffa8;
+  padding: 7px 9px;
+  border-radius: 5px;
+  font-size: 9px;
 }
 
 .loading {
-    position: absolute;
-    inset: 0;
-    display: grid;
-    place-items: center;
-    background: #a7d2e8;
-    color: #18354b;
-    font-size: 12px;
-    pointer-events: none;
-    transition: opacity .5s;
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  color: #18354b;
+  background: #a7d2e8;
+  font: 11px 'DM Mono', monospace;
+  transition: opacity .5s;
+  pointer-events: none;
 }
 
 footer {
-    padding: 12px 28px;
-    color: #69839b;
-    font-size: 9px;
+  height: 36px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0 28px;
+  font-size: 8px;
+  color: #69839b;
 }
 
 @media(max-width:900px) {
-    .layout {
-        grid-template-columns: 1fr;
-    }
-
-    .sidebar {
-        order: 2;
-    }
-
-    .sim-area {
-        min-height: 550px;
-    }
+  .layout { grid-template-columns: 1fr; }
+  .sidebar { order: 2; }
+  .sim-area { min-height: 560px; }
+  .key-grid { grid-template-columns: repeat(3,1fr); }
 }
 
 @media(max-width:560px) {
-    .layout {
-        padding: 9px;
-    }
-
-    .hud {
-        grid-template-columns: repeat(3, 1fr);
-        left: 9px;
-        right: 9px;
-        bottom: 9px;
-    }
-
-    .hud-item {
-        padding: 9px;
-    }
-
-    .hud-item strong {
-        font-size: 16px;
-    }
-
-    .sim-area {
-        min-height: 500px;
-    }
+  .topbar { padding: 0 15px; }
+  .layout { padding: 9px; gap: 10px; }
+  .sim-area { min-height: 500px; }
+  .hud {
+    grid-template-columns: repeat(3,1fr);
+    left: 9px;
+    right: 9px;
+    bottom: 9px;
+  }
+  .hud-item { padding: 9px; }
+  .hud-item strong { font-size: 17px; }
+  .view-help { bottom: 150px; right: 9px; }
+  footer { padding: 0 12px; }
 }
