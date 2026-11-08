@@ -1,61 +1,66 @@
-# SkyIndia Flight Simulator
+# SkyIndia — 3D Flight Simulator
 
-A browser-based 3D flight simulator.
+A browser-based Three.js flight simulator prototype.
 
-## Features
-
-- Airbus aircraft selection
-- Concorde selection
-- Airline liveries
+Features:
+- Selectable Airbus fleet and Concorde
+- Airline visual themes
 - Indian airport selection
-- VNS Varanasi featured airport
-- Three.js 3D graphics
-- Runway and terminal scenery
-- Flight HUD
-- Keyboard controls
+- VNS (Varanasi) selected by default
+- 3D runway and airport terminal environment
+- Passenger concourses and boarding bridges
+- Airport taxiways and apron markings
+- Air traffic control tower and hangars
+- Aircraft landing gear animation
+- Keyboard flight controls
 
-## Installation
+## Run locally
 
-Install Node.js.
+Requirements: Node.js 20.19+ or 22.12+.
 
-Run:
+Install dependencies:
 
 npm install
 
-Start:
+Start the development server:
 
 npm run dev
 
-Build:
+Open the local URL printed by Vite.
+
+## Build
 
 npm run build
 
-## Render Deployment
+## Deploy to Render
 
-Build command:
+1. Push the project to GitHub.
+2. Sign in to Render.
+3. Select New → Static Site.
+4. Connect your GitHub repository.
+5. Build command:
 
 npm install && npm run build
 
-Publish directory:
+6. Publish directory:
 
 dist
 
+7. Deploy.
+
 ## Controls
 
-W - Pitch up
-S - Pitch down
-A - Bank left
-D - Bank right
-Q - Yaw left
-E - Yaw right
-SHIFT - Throttle up
-CTRL - Throttle down
-G - Landing gear
-F - Flaps
-B - Brakes
-R - Reset
+W / S — Pitch up / down
+A / D — Bank left / right
+Q / E — Yaw left / right
+Shift / Ctrl — Throttle
+G — Landing gear
+F — Flaps
+B — Brakes
+R — Reset
 
-## Disclaimer
+## Important
 
-This is an educational simulator prototype.
-It is not intended for real-world aviation training.
+This is a visual browser-game prototype.
+The aircraft models and flight physics are simplified.
+It is not suitable for real-world flight training.
